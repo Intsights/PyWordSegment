@@ -1,0 +1,33 @@
+[package]
+name = "pywordsegment"
+version = "0.1.0"
+authors = ["Gal Ben David <gal@intsights.com>"]
+edition = "2018"
+description = "Concatenated-word segmentation Python library written in Rust"
+readme = "README.md"
+repository = "https://github.com/intsights/pywordsegment"
+license = "MIT"
+keywords = ["word", "segment", "rust", "pyo3"]
+
+[package.metadata.maturin]
+requires-python = ">=3.6"
+classifier = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+]
+
+[lib]
+name = "pywordsegment"
+crate-type = ["cdylib"]
+
+[dependencies]
+
+[dependencies.pyo3]
+version = "0.12"
+features = ["extension-module"]
+
+[profile.release]
+lto = true
+panic = "abort"
