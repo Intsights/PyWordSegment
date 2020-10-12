@@ -1,14 +1,11 @@
 use pyo3::prelude::*;
 use std::cmp;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::BufReader;
-use std::io::prelude::*;
 
 const MAX_WORD_LEN: usize = 24;
 
 #[pyclass]
-#[text_signature = "(unigrams_file_path, bigrams_file_path, total_words_frequency, /)"]
+#[text_signature = "(unigrams, bigrams, total_words_frequency, /)"]
 #[derive(Default)]
 struct WordSegmenter {
     unigrams: HashMap<String, f64>,
@@ -20,32 +17,10 @@ struct WordSegmenter {
 impl WordSegmenter {
     #[new]
     fn new(
-        unigrams_file_path: &str,
-        bigrams_file_path: &str,
+        unigrams: HashMap<String, f64>,
+        bigrams: HashMap<String, f64>,
         total_words_frequency: f64,
     ) -> Self {
-        let mut unigrams = HashMap::new();
-        let unigrams_file = File::open(unigrams_file_path).unwrap();
-        let unigrams_file_buf_reader = BufReader::new(unigrams_file);
-        for line in unigrams_file_buf_reader.lines() {
-            let line = line.unwrap();
-            let splitted_line: Vec<&str> = line.split('\t').collect();
-            let word = splitted_line.get(0).unwrap().to_string();
-            let frequency = splitted_line.get(1).unwrap().parse().unwrap();
-            unigrams.insert(word, frequency);
-        }
-
-        let mut bigrams = HashMap::new();
-        let bigrams_file = File::open(bigrams_file_path).unwrap();
-        let bigrams_file_buf_reader = BufReader::new(bigrams_file);
-        for line in bigrams_file_buf_reader.lines() {
-            let line = line.unwrap();
-            let splitted_line: Vec<&str> = line.split('\t').collect();
-            let word = splitted_line.get(0).unwrap().to_string();
-            let frequency = splitted_line.get(1).unwrap().parse().unwrap();
-            bigrams.insert(word, frequency);
-        }
-
         WordSegmenter {
             unigrams,
             bigrams,

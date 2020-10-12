@@ -1,4 +1,6 @@
+import gzip
 import pathlib
+import pickle
 import typing
 
 from . import pywordsegment
@@ -11,9 +13,25 @@ class WordSegmenter:
         self,
     ) -> None:
         if WordSegmenter.word_segmenter is None:
+            current_file_dir = pathlib.Path(__file__).parent.absolute()
+
+            unigrams_file = current_file_dir.joinpath('unigrams.pkl.gz')
+            unigrams = pickle.load(
+                file=gzip.GzipFile(
+                    filename=str(unigrams_file),
+                ),
+            )
+
+            bigrams_file = current_file_dir.joinpath('bigrams.pkl.gz')
+            bigrams = pickle.load(
+                file=gzip.GzipFile(
+                    filename=str(bigrams_file),
+                ),
+            )
+
             WordSegmenter.word_segmenter = pywordsegment.WordSegmenter(
-                unigrams_file_path=str(pathlib.Path(__file__).parent.absolute().joinpath('unigrams.txt')),
-                bigrams_file_path=str(pathlib.Path(__file__).parent.absolute().joinpath('bigrams.txt')),
+                unigrams=unigrams,
+                bigrams=bigrams,
                 total_words_frequency=1024908267229.0,
             )
 

@@ -15,7 +15,7 @@ strip = true
 
 [tool.poetry]
 name = "pywordsegment"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Gal Ben David <gal@intsights.com>"]
 description = "Concatenated-word segmentation Python library written in Rust"
 readme = "README.md"
@@ -36,7 +36,8 @@ classifiers = [
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
-    "Programming Language :: Rust"
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Rust",
 ]
 packages = [
     { include = "pywordsegment" },
