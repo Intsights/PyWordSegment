@@ -113,21 +113,19 @@ impl WordSegmenter {
                     suffix_words.insert(0, prefix);
                     best_candidate = (prefix_score + suffix_score, suffix_words);
                 }
-            } else {
-                if suffix.is_empty() {
-                    if best_candidate.0 < prefix_score {
-                        best_candidate = (prefix_score, vec![prefix]);
-                    }
-                    memo.insert((suffix, prefix), (0.0, Vec::new()));
-                } else {
-                    let (suffix_score, suffix_words) = self.search(memo, suffix, prefix);
-                    if best_candidate.0 < prefix_score + suffix_score {
-                        let mut suffix_words = suffix_words.clone();
-                        suffix_words.insert(0, prefix);
-                        best_candidate = (prefix_score + suffix_score, suffix_words);
-                    }
-                    memo.insert((suffix, prefix), (suffix_score, suffix_words));
+            } else if suffix.is_empty() {
+                if best_candidate.0 < prefix_score {
+                    best_candidate = (prefix_score, vec![prefix]);
                 }
+                memo.insert((suffix, prefix), (0.0, Vec::new()));
+            } else {
+                let (suffix_score, suffix_words) = self.search(memo, suffix, prefix);
+                if best_candidate.0 < prefix_score + suffix_score {
+                    let mut suffix_words = suffix_words.clone();
+                    suffix_words.insert(0, prefix);
+                    best_candidate = (prefix_score + suffix_score, suffix_words);
+                }
+                memo.insert((suffix, prefix), (suffix_score, suffix_words));
             }
         }
 
