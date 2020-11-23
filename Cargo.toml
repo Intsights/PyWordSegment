@@ -1,6 +1,6 @@
 [package]
 name = "pywordsegment"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Gal Ben David <gal@intsights.com>"]
 edition = "2018"
 description = "Concatenated-word segmentation Python library written in Rust"

@@ -50,10 +50,9 @@ import pywordsegment
 # The internal UNIGRAMS & BIGRAMS corpuses are lazy initialized
 # once per the whole module. Multiple WordSegmenter instances would
 # not create new dictionaries.
-word_segmenter = pywordsegment.WordSegmenter()
 
 # Segments a word to its parts
-word_segmenter.segment(
+pywordsegment.WordSegmenter.segment(
     text="theusashops",
 )
 # ["the", "usa", "shops"]
@@ -61,13 +60,13 @@ word_segmenter.segment(
 
 # This function checks whether the substring exists as a whole segment
 # inside text.
-word_segmenter.exist_as_segment(
+pywordsegment.WordSegmenter.exist_as_segment(
     substring="inter",
     text="internationalairport",
 )
 # False
 
-word_segmenter.exist_as_segment(
+pywordsegment.WordSegmenter.exist_as_segment(
     substring="inter",
     text="intermilan",
 )

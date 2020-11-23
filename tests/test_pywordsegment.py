@@ -9,9 +9,8 @@ class WordSegmentTestCase(
     def test_segment_1(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='theusashops',
             ),
             second=[
@@ -24,9 +23,8 @@ class WordSegmentTestCase(
     def test_segment_2(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='choosespain',
             ),
             second=[
@@ -38,9 +36,8 @@ class WordSegmentTestCase(
     def test_segment_3(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='thisisatest',
             ),
             second=[
@@ -54,9 +51,8 @@ class WordSegmentTestCase(
     def test_segment_4(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='wheninthecourseofhumaneventsitbecomesnecessary',
             ),
             second=[
@@ -76,9 +72,8 @@ class WordSegmentTestCase(
     def test_segment_5(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='whorepresents',
             ),
             second=[
@@ -90,9 +85,8 @@ class WordSegmentTestCase(
     def test_segment_6(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='expertsexchange',
             ),
             second=[
@@ -104,9 +98,8 @@ class WordSegmentTestCase(
     def test_segment_7(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='speedofart',
             ),
             second=[
@@ -119,9 +112,8 @@ class WordSegmentTestCase(
     def test_segment_8(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='nowisthetimeforallgood',
             ),
             second=[
@@ -138,9 +130,8 @@ class WordSegmentTestCase(
     def test_segment_9(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='itisatruthuniversallyacknowledged',
             ),
             second=[
@@ -156,9 +147,8 @@ class WordSegmentTestCase(
     def test_segment_10(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='itwasabrightcolddayinaprilandtheclockswerestrikingthirteen',
             ),
             second=[
@@ -182,13 +172,28 @@ class WordSegmentTestCase(
     def test_segment_11(
         self,
     ):
-        word_segmenter = pywordsegment.WordSegmenter()
         self.assertEqual(
-            first=word_segmenter.segment(
+            first=pywordsegment.WordSegmenter.segment(
                 text='CaseTest',
             ),
             second=[
                 'case',
                 'test',
             ],
+        )
+
+    def test_exist_as_segment_1(
+        self,
+    ):
+        self.assertFalse(
+            expr=pywordsegment.WordSegmenter.exist_as_segment(
+                substring='man',
+                text='manual',
+            ),
+        )
+        self.assertTrue(
+            expr=pywordsegment.WordSegmenter.exist_as_segment(
+                substring='man',
+                text='oneman',
+            ),
         )

@@ -2,17 +2,16 @@ import typing
 
 
 class WordSegmenter:
-    def __init__(
-        self,
-    ) -> None: ...
+    @staticmethod
+    def load() -> None: ...
 
+    @staticmethod
     def segment(
-        self,
         text: str,
-    ) -> typing.List[str, str]: ...
+    ) -> typing.List[str]: ...
 
+    @staticmethod
     def exist_as_segment(
-        self,
         substring: str,
         text: str,
     ) -> bool: ...

@@ -15,7 +15,7 @@ strip = true
 
 [tool.poetry]
 name = "pywordsegment"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Gal Ben David <gal@intsights.com>"]
 description = "Concatenated-word segmentation Python library written in Rust"
 readme = "README.md"
