@@ -29,9 +29,15 @@ name = "pywordsegment"
 crate-type = ["cdylib"]
 
 [dependencies]
+ahash = "0.7"
+bincode = "1"
+flate2 = { version = "1.0", features = ["zlib-ng-compat"], default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+smartstring = "0.2"
+once_cell = "1.8"
 
 [dependencies.pyo3]
-version = "0.12.4"
+version = "0.14.5"
 features = ["extension-module"]
 
 [profile.release]
