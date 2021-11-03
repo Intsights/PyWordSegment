@@ -1,6 +1,5 @@
 import gzip
-import pathlib
-import pickle
+import importlib.resources
 import typing
 
 from . import pywordsegment
@@ -12,26 +11,22 @@ class WordSegmenter:
     @staticmethod
     def load() -> None:
         if WordSegmenter.word_segmenter is None:
-            current_file_dir = pathlib.Path(__file__).parent.absolute()
-
-            unigrams_file = current_file_dir.joinpath('unigrams.pkl.gz')
-            unigrams = pickle.load(
-                file=gzip.GzipFile(
-                    filename=str(unigrams_file),
+            unigrams_serialized = gzip.decompress(
+                data=importlib.resources.read_binary(
+                    package=__package__,
+                    resource='unigrams.msgpack.gz',
                 ),
             )
-
-            bigrams_file = current_file_dir.joinpath('bigrams.pkl.gz')
-            bigrams = pickle.load(
-                file=gzip.GzipFile(
-                    filename=str(bigrams_file),
+            bigrams_serialized = gzip.decompress(
+                data=importlib.resources.read_binary(
+                    package=__package__,
+                    resource='bigrams.msgpack.gz',
                 ),
             )
 
             WordSegmenter.word_segmenter = pywordsegment.WordSegmenter(
-                unigrams=unigrams,
-                bigrams=bigrams,
-                total_words_frequency=1024908267229.0,
+                unigrams_serialized=unigrams_serialized,
+                bigrams_serialized=bigrams_serialized,
             )
 
     @staticmethod
@@ -41,9 +36,7 @@ class WordSegmenter:
         if WordSegmenter.word_segmenter is None:
             WordSegmenter.load()
 
-        return WordSegmenter.word_segmenter.segment(
-            text=text,
-        )
+        return WordSegmenter.word_segmenter.segment(text)
 
     @staticmethod
     def exist_as_segment(
@@ -53,7 +46,4 @@ class WordSegmenter:
         if WordSegmenter.word_segmenter is None:
             WordSegmenter.load()
 
-        return WordSegmenter.word_segmenter.exist_as_segment(
-            substring=substring,
-            text=text,
-        )
+        return WordSegmenter.word_segmenter.exist_as_segment(substring, text)
