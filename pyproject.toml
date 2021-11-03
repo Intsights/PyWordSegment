@@ -1,5 +1,5 @@
 [build-system]
-requires = ["maturin"]
+requires = ["maturin>=0.11,<0.12"]
 build-backend = "maturin"
 
 [tool.maturin]
@@ -10,8 +10,6 @@ sdist-include = [
     "pywordsegment/*.pyi",
     "pywordsegment/*.txt"
 ]
-manylinux = "2014"
-strip = true
 
 [tool.poetry]
 name = "pywordsegment"
