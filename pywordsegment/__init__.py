@@ -1,33 +1,49 @@
-import pathlib
-import pickle
 import gzip
+import importlib.resources
+import typing
 
 from . import pywordsegment
 
 
-segment = pywordsegment.segment
-exist_as_segment = pywordsegment.exist_as_segment
+class WordSegmenter:
+    word_segmenter: pywordsegment.WordSegmenter = None
 
+    @staticmethod
+    def load() -> None:
+        if WordSegmenter.word_segmenter is None:
+            unigrams_serialized = gzip.decompress(
+                data=importlib.resources.read_binary(
+                    package=__package__,
+                    resource='unigrams.msgpack.gz',
+                ),
+            )
+            bigrams_serialized = gzip.decompress(
+                data=importlib.resources.read_binary(
+                    package=__package__,
+                    resource='bigrams.msgpack.gz',
+                ),
+            )
 
-def create_dictionary_file() -> None:
-    current_file_dir = pathlib.Path(__file__).parent.absolute()
+            WordSegmenter.word_segmenter = pywordsegment.WordSegmenter(
+                unigrams_serialized=unigrams_serialized,
+                bigrams_serialized=bigrams_serialized,
+            )
 
-    unigrams_file = current_file_dir.joinpath('unigrams.pkl.gz')
-    unigrams = pickle.load(
-        file=gzip.GzipFile(
-            filename=str(unigrams_file),
-        ),
-    )
+    @staticmethod
+    def segment(
+        text: str,
+    ) -> typing.List[str]:
+        if WordSegmenter.word_segmenter is None:
+            WordSegmenter.load()
 
-    bigrams_file = current_file_dir.joinpath('bigrams.pkl.gz')
-    bigrams = pickle.load(
-        file=gzip.GzipFile(
-            filename=str(bigrams_file),
-        ),
-    )
+        return WordSegmenter.word_segmenter.segment(text)
 
-    pywordsegment.create_dictionary_file(
-        unigrams=unigrams,
-        bigrams=bigrams,
-        total_words_frequency=1024908267229.0,
-    )
+    @staticmethod
+    def exist_as_segment(
+        substring: str,
+        text: str,
+    ) -> bool:
+        if WordSegmenter.word_segmenter is None:
+            WordSegmenter.load()
+
+        return WordSegmenter.word_segmenter.exist_as_segment(substring, text)

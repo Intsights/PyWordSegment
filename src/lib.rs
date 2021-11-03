@@ -1,64 +1,41 @@
 use ahash::RandomState;
-use flate2::Compression;
-use flate2::write::GzEncoder;
-use flate2::read::GzDecoder;
-use once_cell::sync::Lazy;
-use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
-use serde::{Serialize, Deserialize};
-use smartstring::{SmartString, Compact};
-use std::cmp;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{BufWriter, BufReader};
 
 const MAX_WORD_LEN: usize = 24;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[pyclass]
 struct WordSegmenter {
     unigrams: HashMap<String, f64, RandomState>,
-    bigrams: HashMap<String, f64, RandomState>,
-    total_words_frequency: f64,
+    bigrams: HashMap<String, HashMap<String, f64, RandomState>, RandomState>,
+    unknown_unigrams: [f64; MAX_WORD_LEN + 1],
 }
 
-static WORD_SEGMENTER: Lazy<WordSegmenter> = Lazy::new(
-    || {
-        let word_segmenter_file = File::open("/home/wavenator/work/pywordsegment/pywordsegment/pywordsegment/word_segmenter.bincode").unwrap();
-        let word_segmenter_file = BufReader::new(word_segmenter_file);
-        let decoder = GzDecoder::new(word_segmenter_file);
+#[pymethods]
+impl WordSegmenter {
+    #[new]
+    fn new(
+        unigrams_serialized: &[u8],
+        bigrams_serialized: &[u8],
+    ) -> Self {
+        let unigrams: HashMap<String, f64, RandomState> = rmp_serde::from_read_ref(unigrams_serialized).unwrap();
+        let bigrams = rmp_serde::from_read_ref(bigrams_serialized).unwrap();
 
-        bincode::deserialize_from(decoder).unwrap()
-    }
-);
+        let total_unigrams_frequency = unigrams.get("unigrams_total_count").unwrap();
+        let mut unknown_unigrams = [0.0; MAX_WORD_LEN + 1];
+        for (word_len, value) in unknown_unigrams.iter_mut().enumerate() {
+            *value = (10.0 / (total_unigrams_frequency * 10_f64.powi(word_len as i32))).log10();
+        }
 
-
-#[pymodule]
-fn pywordsegment(
-    _py: Python,
-    m: &PyModule,
-) -> PyResult<()> {
-    #[pyfn(m)]
-    fn create_dictionary_file(
-        unigrams: HashMap<String, f64, RandomState>,
-        bigrams: HashMap<String, f64, RandomState>,
-        total_words_frequency: f64,
-    ) -> PyResult<()> {
-        let word_segmenter = WordSegmenter {
+        WordSegmenter {
             unigrams,
             bigrams,
-            total_words_frequency,
-        };
-        let word_segmenter_file = File::create("word_segmenter.bincode")?;
-        let word_segmenter_file = BufWriter::new(word_segmenter_file);
-
-        let encoder = GzEncoder::new(word_segmenter_file, Compression::default());
-
-        bincode::serialize_into(encoder, &word_segmenter)
-            .map_err(|err| PyRuntimeError::new_err(format!("Could not serialize: {:?}", err)))
+            unknown_unigrams,
+        }
     }
 
-    #[pyfn(m)]
     fn segment(
+        &self,
         py: Python,
         text: String,
     ) -> PyResult<Py<PyAny>> {
@@ -69,17 +46,13 @@ fn pywordsegment(
                 ""
             );
 
-        let n = clean_text.len();
-        let clean_text_len_triangular_number = (n * (n + 1) * (n + 2)) / 6;
-        let mut memo = HashMap::with_capacity(clean_text_len_triangular_number);
-
-        let (_score, words) = search(&mut memo, &clean_text, "<s>");
+        let words = self.search(&clean_text);
 
         Ok(words.into_py(py))
     }
 
-    #[pyfn(m)]
     fn exist_as_segment(
+        &self,
         substring: String,
         text: String,
     ) -> PyResult<bool> {
@@ -97,78 +70,92 @@ fn pywordsegment(
                 ""
             );
 
-        let n = cmp::max(clean_text.len(), clean_substring.len());
-        let clean_text_len_triangular_number = (n * (n + 1) * (n + 2)) / 6;
-        let mut memo = HashMap::with_capacity(clean_text_len_triangular_number);
-
-        let (_score, segmented_text) = search(&mut memo, &clean_text, "<s>");
-        memo.clear();
-        let (_score, segmented_substring) = search(&mut memo, &clean_substring, "<s>");
+        let segmented_text = self.search(&clean_text);
+        let segmented_substring = self.search(&clean_substring);
 
         let segmented_substring_pattern = format!("-{}-", segmented_substring.join("-"));
         let segmented_text_pattern = format!("-{}-", segmented_text.join("-"));
 
         Ok(segmented_text_pattern.contains(&segmented_substring_pattern))
     }
+}
 
+impl WordSegmenter {
     fn score(
+        &self,
         word: &str,
         previous: &str,
     ) -> f64 {
-        if WORD_SEGMENTER.unigrams.contains_key(previous) {
-            let mut bigram = SmartString::<Compact>::new();
-            bigram.push_str(previous);
-            bigram.push_str(" ");
-            bigram.push_str(word);
-            if let Some(bigram_frequency) = WORD_SEGMENTER.bigrams.get(bigram.as_str()) {
-                return bigram_frequency / WORD_SEGMENTER.unigrams.get(previous).unwrap();
+        if !previous.is_empty() {
+            if let Some(first_bigram_layer) = self.bigrams.get(previous) {
+                if let Some(bigram_frequency) = first_bigram_layer.get(word) {
+                    return *bigram_frequency;
+                }
             }
         }
-        match WORD_SEGMENTER.unigrams.get(word) {
-            Some(frequency) => frequency / WORD_SEGMENTER.total_words_frequency,
-            None => 10.0 / (WORD_SEGMENTER.total_words_frequency * 10_f64.powi(word.len() as i32)),
+
+        match self.unigrams.get(word) {
+            Some(frequency) => *frequency,
+            None => self.unknown_unigrams[word.len()],
         }
     }
 
     fn search<'a>(
-        memo: &mut HashMap<(&'a str, &'a str), (f64, Vec<&'a str>)>,
+        &self,
         text: &'a str,
-        previous: &str,
-    ) -> (f64, Vec<&'a str>) {
-        let mut best_candidate = (-100000.0, Vec::new());
-        for pos in 1..cmp::min(text.len(), MAX_WORD_LEN) + 1 {
-            let prefix = &text[..pos];
-            let suffix = &text[pos..];
-            let prefix_score = score(prefix, previous).log10();
+    ) -> Vec<&'a str> {
+        let mut result = Vec::with_capacity(text.len());
+        let mut candidates = Vec::with_capacity(text.len());
 
-            if let Some((suffix_score, suffix_words)) = memo.get(&(suffix, prefix)) {
-                if best_candidate.0 < prefix_score + suffix_score {
-                    best_candidate.0 = prefix_score + suffix_score;
-                    best_candidate.1.clear();
-                    best_candidate.1.push(prefix);
-                    best_candidate.1.extend(suffix_words);
+        for end in 1..=text.len() {
+            let start = end.saturating_sub(MAX_WORD_LEN);
+            for split in start..end {
+                let (prev, prev_score) = match split {
+                    0 => ("", 0.0),
+                    _ => {
+                        let (prefix_len, prefix_score) = candidates[split - 1];
+                        let word = &text[split - prefix_len as usize..split];
+                        (word, prefix_score)
+                    }
+                };
+
+                let word = &text[split..end];
+                let score = self.score(word, prev) + prev_score;
+                match candidates.get_mut(end - 1) {
+                    Some((cur_len, cur_score)) if *cur_score < score => {
+                        *cur_len = end - split;
+                        *cur_score = score;
+                    }
+                    None => candidates.push((end - split, score)),
+                    _ => {},
                 }
-            } else if suffix.is_empty() {
-                if best_candidate.0 < prefix_score {
-                    best_candidate.0 = prefix_score;
-                    best_candidate.1.clear();
-                    best_candidate.1.push(prefix);
-                }
-                memo.insert((suffix, prefix), (0.0, Vec::new()));
-            } else {
-                let (suffix_score, suffix_words) = search(memo, suffix, prefix);
-                if best_candidate.0 < prefix_score + suffix_score {
-                    best_candidate.0 = prefix_score + suffix_score;
-                    best_candidate.1.clear();
-                    best_candidate.1.push(prefix);
-                    best_candidate.1.extend(&suffix_words);
-                }
-                memo.insert((suffix, prefix), (suffix_score, suffix_words));
             }
         }
 
-        best_candidate
+        let mut end = text.len();
+        let (mut best_len, mut _best_score) = candidates[end - 1];
+        loop {
+            let word = &text[end - best_len..end];
+            result.insert(0, word);
+
+            end -= best_len;
+            if end == 0 {
+                break;
+            }
+
+            best_len = candidates[end - 1].0;
+        }
+
+        result
     }
+}
+
+#[pymodule]
+fn pywordsegment(
+    _py: Python,
+    m: &PyModule,
+) -> PyResult<()> {
+    m.add_class::<WordSegmenter>()?;
 
     Ok(())
 }
