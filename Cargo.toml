@@ -1,6 +1,6 @@
 [package]
 name = "pywordsegment"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Gal Ben David <gal@intsights.com>"]
 edition = "2021"
 description = "Concatenated-word segmentation Python library written in Rust"
@@ -8,7 +8,12 @@ readme = "README.md"
 repository = "https://github.com/intsights/pywordsegment"
 homepage = "https://github.com/intsights/pywordsegment"
 license = "MIT"
-keywords = ["word", "segment", "rust", "pyo3"]
+keywords = [
+    "word",
+    "segment",
+    "rust",
+    "pyo3",
+]
 
 [package.metadata.maturin]
 requires-python = ">=3.7"
@@ -33,7 +38,7 @@ ahash = "0.7"
 rmp-serde = "0.15"
 
 [dependencies.pyo3]
-version = "0.14.5"
+version = "0.15.1"
 features = ["extension-module"]
 
 [profile.release]

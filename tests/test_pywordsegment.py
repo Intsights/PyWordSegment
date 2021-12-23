@@ -182,6 +182,28 @@ class WordSegmentTestCase(
             ],
         )
 
+    def test_segment_12(
+        self,
+    ):
+        self.assertEqual(
+            first=pywordsegment.WordSegmenter.segment(
+                text='',
+            ),
+            second=[],
+        )
+
+    def test_segment_13(
+        self,
+    ):
+        self.assertEqual(
+            first=pywordsegment.WordSegmenter.segment(
+                text='a',
+            ),
+            second=[
+                'a',
+            ],
+        )
+
     def test_exist_as_segment_1(
         self,
     ):

@@ -107,6 +107,10 @@ impl WordSegmenter {
         let mut result = Vec::with_capacity(text.len());
         let mut candidates = Vec::with_capacity(text.len());
 
+        if text.is_empty() {
+            return result;
+        }
+
         for end in 1..=text.len() {
             let start = end.saturating_sub(MAX_WORD_LEN);
             for split in start..end {
