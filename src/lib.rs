@@ -18,8 +18,8 @@ impl WordSegmenter {
         unigrams_serialized: &[u8],
         bigrams_serialized: &[u8],
     ) -> Self {
-        let unigrams: HashMap<String, f64, RandomState> = rmp_serde::from_read_ref(unigrams_serialized).unwrap();
-        let bigrams = rmp_serde::from_read_ref(bigrams_serialized).unwrap();
+        let unigrams: HashMap<String, f64, RandomState> = rmp_serde::from_slice(unigrams_serialized).unwrap();
+        let bigrams = rmp_serde::from_slice(bigrams_serialized).unwrap();
 
         let total_unigrams_frequency = unigrams.get("unigrams_total_count").unwrap();
         let mut unknown_unigrams = [0.0; MAX_WORD_LEN + 1];

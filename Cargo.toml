@@ -1,6 +1,6 @@
 [package]
 name = "pywordsegment"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Gal Ben David <gal@intsights.com>"]
 edition = "2021"
 description = "Concatenated-word segmentation Python library written in Rust"
@@ -35,10 +35,10 @@ crate-type = ["cdylib"]
 
 [dependencies]
 ahash = "0.7"
-rmp-serde = "0.15"
+rmp-serde = "1"
 
 [dependencies.pyo3]
-version = "0.15.1"
+version = "0.16.5"
 features = ["extension-module"]
 
 [profile.release]

@@ -1,19 +1,20 @@
 [build-system]
-requires = ["maturin>=0.11,<0.12"]
+requires = ["maturin>=0.12,<0.13"]
 build-backend = "maturin"
 
 [tool.maturin]
 sdist-include = [
-    "src/*",
     "Cargo.toml",
+    "pyproject.toml",
+    "pywordsegment/*.gz",
     "pywordsegment/*.py",
     "pywordsegment/*.pyi",
-    "pywordsegment/*.txt"
+    "src/*",
 ]
 
 [tool.poetry]
 name = "pywordsegment"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Gal Ben David <gal@intsights.com>"]
 description = "Concatenated-word segmentation Python library written in Rust"
 readme = "README.md"
