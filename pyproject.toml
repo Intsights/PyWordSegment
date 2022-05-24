@@ -38,10 +38,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Rust",
 ]
-packages = [
-    { include = "pywordsegment" },
-    { include = "src" },
-]
 
 [tool.poetry.dependencies]
 python = "^3.7"
