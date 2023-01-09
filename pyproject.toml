@@ -14,7 +14,7 @@ sdist-include = [
 
 [tool.poetry]
 name = "pywordsegment"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Gal Ben David <gal@intsights.com>"]
 description = "Concatenated-word segmentation Python library written in Rust"
 readme = "README.md"
@@ -36,6 +36,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Rust",
 ]
 
