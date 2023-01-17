@@ -44,7 +44,6 @@ class WordSegmenter:
                 unigrams_serialized=unigrams_serialized,
                 bigrams_serialized=bigrams_serialized,
             )
-        raise RuntimeError('un supported python version')
 
     @staticmethod
     def segment(
