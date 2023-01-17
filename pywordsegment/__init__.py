@@ -14,7 +14,7 @@ class WordSegmenter:
     @staticmethod
     def load() -> None:
         if WordSegmenter.word_segmenter is None:
-            if PY_VERSION_MAJOR > 3 and PY_VERSION_MINOR >= 11:
+            if PY_VERSION_MAJOR >= 3 and PY_VERSION_MINOR >= 11:
                 with importlib.resources.files(
                     __package__,
                 ).joinpath(
