@@ -33,17 +33,17 @@ class WordSegmenter:
                     ),
                 )
 
-                bigrams_serialized = gzip.decompress(
-                    data=importlib.resources.read_binary(
-                        package=__package__,
-                        resource='bigrams.msgpack.gz',
-                    ),
-                )
+            bigrams_serialized = gzip.decompress(
+                data=importlib.resources.read_binary(
+                    package=__package__,
+                    resource='bigrams.msgpack.gz',
+                ),
+            )
 
-                WordSegmenter.word_segmenter = pywordsegment.WordSegmenter(
-                    unigrams_serialized=unigrams_serialized,
-                    bigrams_serialized=bigrams_serialized,
-                )
+            WordSegmenter.word_segmenter = pywordsegment.WordSegmenter(
+                unigrams_serialized=unigrams_serialized,
+                bigrams_serialized=bigrams_serialized,
+            )
         raise RuntimeError('un supported python version')
 
     @staticmethod
