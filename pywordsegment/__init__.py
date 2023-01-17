@@ -21,10 +21,20 @@ class WordSegmenter:
                     'unigrams.msgpack.gz',
                 ).open(
                     'rb',
-                ) as binary_file:
+                ) as unigrams_msgpack, importlib.resources.files(
+                    __package__,
+                ).joinpath(
+                    'bigrams.msgpack.gz',
+                ).open(
+                    'rb',
+                ) as bigrams_msgpack:
                     unigrams_serialized = gzip.decompress(
-                        data=binary_file.read(),
+                        data=unigrams_msgpack.read(),
                     )
+                    bigrams_serialized = gzip.decompress(
+                        data=bigrams_msgpack.read(),
+                    )
+
             else:
                 unigrams_serialized = gzip.decompress(
                     data=importlib.resources.read_binary(
@@ -33,12 +43,12 @@ class WordSegmenter:
                     ),
                 )
 
-            bigrams_serialized = gzip.decompress(
-                data=importlib.resources.read_binary(
-                    package=__package__,
-                    resource='bigrams.msgpack.gz',
-                ),
-            )
+                bigrams_serialized = gzip.decompress(
+                    data=importlib.resources.read_binary(
+                        package=__package__,
+                        resource='bigrams.msgpack.gz',
+                    ),
+                )
 
             WordSegmenter.word_segmenter = pywordsegment.WordSegmenter(
                 unigrams_serialized=unigrams_serialized,
