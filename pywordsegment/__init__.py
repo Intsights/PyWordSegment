@@ -23,7 +23,7 @@ class WordSegmenter:
                     'rb',
                 ) as binary_file:
                     unigrams_serialized = gzip.decompress(
-                        data=binary_file,
+                        data=binary_file.read(),
                     )
             else:
                 unigrams_serialized = gzip.decompress(
