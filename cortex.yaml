@@ -1,0 +1,15 @@
+---
+info:
+  title: Pywordsegment
+  description: Concatenated-word segmentation Python library written in Rust
+  x-cortex-git:
+    github:
+      alias: intsightsorg
+      repository: Intsights/PyWordSegment
+  x-cortex-tag: pywordsegment
+  x-cortex-type: service
+  x-cortex-domain-parents:
+  - tag: threatintel-rd
+openapi: 3.0.1
+servers:
+- url: "/"
