@@ -23,7 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Rust
@@ -35,8 +35,8 @@ jobs:
       - name: Install Cross-compilers (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew install FiloSottile/musl-cross/musl-cross
-          brew install mingw-w64
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
       - name: Publish Package
         uses: PyO3/maturin-action@v1
         with:
